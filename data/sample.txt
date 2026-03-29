@@ -1,0 +1,16 @@
+Artificial Intelligence Overview
+
+Artificial intelligence (AI) is the simulation of human intelligence by machines.
+It includes learning, reasoning, and self-correction.
+
+Machine Learning is a subset of AI where systems learn from data without being explicitly programmed.
+Common types include supervised learning, unsupervised learning, and reinforcement learning.
+
+Deep Learning uses neural networks with many layers to learn from large amounts of data.
+It powers applications like image recognition, speech recognition, and language translation.
+
+Natural Language Processing (NLP) allows machines to understand and generate human language.
+Examples include chatbots, translation tools, and document summarizers.
+
+Large Language Models (LLMs) are trained on massive text datasets and can generate human-like text.
+Examples include GPT, BERT, and FLAN-T5.
