@@ -1,15 +1,42 @@
 # Document QA Assistant
+### Generative AI Application | RAG + LangChain + FAISS + OpenAI
 
-A question-answering assistant that ingests multi-source documents, structures them for retrieval, and answers questions using LangChain and an LLM backend.
+A production-style question-answering system built as part of the **IBM Generative AI Engineering** curriculum on Coursera. Demonstrates end-to-end retrieval-augmented generation (RAG) — from multi-source document ingestion to LLM-powered answers via a conversational interface.
 
 ---
 
-## What It Does
+## Objective
 
-- Loads documents from multiple sources (PDFs, text files, URLs)
-- Splits and chunks documents using LangChain's text-splitting strategies
-- Stores chunks in a vector store for semantic search
-- Answers user questions by retrieving relevant context and passing it to an LLM
+Build a real-world AI application that can **ingest documents from multiple sources, semantically retrieve relevant context, and answer natural language questions** — without hallucinating or relying solely on the LLM's training data.
+
+This project bridges the gap between raw document storage and intelligent, context-aware Q&A by combining vector search with large language models through a structured RAG pipeline.
+
+---
+
+## Core Stages
+
+### 1. Document Ingestion
+Load content from heterogeneous sources using LangChain's document loaders — PDFs, plain text files, and web URLs — into a unified document format ready for downstream processing.
+
+### 2. Text Splitting
+Apply chunking strategies (fixed-size with overlap) to break large documents into semantically coherent segments. Chunk size and overlap are tuned to balance retrieval precision with context completeness.
+
+### 3. Embedding + Vector Store
+Generate dense vector embeddings for each chunk using OpenAI Embeddings and index them in a **FAISS** vector store for fast approximate nearest-neighbor search at query time.
+
+### 4. Retrieval
+On each user query, the retriever performs semantic similarity search over the FAISS index to surface the most relevant document chunks — replacing keyword matching with meaning-based retrieval.
+
+### 5. LLM-Powered Answer Generation
+Retrieved chunks are injected into a prompt and passed to **GPT-3.5-turbo** via a LangChain QA chain. The model synthesizes a grounded answer using only the retrieved context, reducing hallucination.
+
+---
+
+## Final Output
+
+- **Interactive CLI Q&A interface** — ask questions in plain English, get answers grounded in your documents
+- **Modular RAG pipeline** — each stage (loading, splitting, embedding, retrieval, generation) is independently testable and swappable
+- **Portfolio-ready codebase** — structured for readability, extensibility, and real-world deployment
 
 ---
 
@@ -18,10 +45,11 @@ A question-answering assistant that ingests multi-source documents, structures t
 | Layer | Tool |
 |---|---|
 | Framework | LangChain |
-| LLM | OpenAI (gpt-3.5-turbo) |
+| LLM | OpenAI GPT-3.5-turbo |
 | Vector Store | FAISS |
 | Embeddings | OpenAI Embeddings |
 | Document Loaders | LangChain (PDF, TextFile, WebBase) |
+| Interface | Python CLI |
 
 ---
 
@@ -29,14 +57,14 @@ A question-answering assistant that ingests multi-source documents, structures t
 
 ```
 doc-qa-assistant/
-├── data/                  # Raw input documents
+├── data/                  # Raw input documents (PDF, TXT, URLs)
 ├── src/
-│   ├── loader.py          # Document loading logic
-│   ├── splitter.py        # Text splitting strategies
-│   ├── vectorstore.py     # Embedding + vector store setup
-│   ├── retriever.py       # Retrieval logic
-│   └── qa_chain.py        # QA chain assembly
-├── main.py                # Entry point
+│   ├── loader.py          # Multi-source document loading
+│   ├── splitter.py        # Chunking strategies with overlap
+│   ├── vectorstore.py     # Embedding generation + FAISS indexing
+│   ├── retriever.py       # Semantic similarity retrieval
+│   └── qa_chain.py        # LangChain QA chain assembly
+├── main.py                # Entry point + interactive prompt loop
 ├── .env                   # API keys (not committed)
 ├── requirements.txt
 └── README.md
@@ -50,58 +78,51 @@ doc-qa-assistant/
 git clone <repo-url>
 cd doc-qa-assistant
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate       # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
 Create a `.env` file:
-
 ```
 OPENAI_API_KEY=your_key_here
 ```
 
----
-
-## Usage
-
-Place your documents in the `data/` folder, then run:
-
+Place documents in the `data/` folder, then run:
 ```bash
 python main.py
 ```
 
-You'll get an interactive prompt to ask questions against your documents.
-
 ---
 
-## How It Works
+## Pipeline Architecture
 
 ```
 Documents (PDF / TXT / URL)
         ↓
-  Document Loaders
+  Document Loaders          ← LangChain WebBase, PyPDF, TextFile
         ↓
-  Text Splitter (chunks)
+  Text Splitter             ← 500-token chunks, 50-token overlap
         ↓
-  Embeddings → Vector Store
+  OpenAI Embeddings         ← dense vector representations
         ↓
-  User Query → Retriever → Relevant Chunks
+  FAISS Vector Store        ← local index, similarity search
         ↓
-  LLM → Answer
+  User Query → Retriever    ← top-k semantically relevant chunks
+        ↓
+  GPT-3.5-turbo → Answer    ← context-grounded response
 ```
 
 ---
 
-## Environment Variables
+## Configuration
 
-| Variable | Description |
-|---|---|
-| `OPENAI_API_KEY` | Your OpenAI API key |
+| Parameter | Default | Description |
+|---|---|---|
+| `OPENAI_API_KEY` | — | OpenAI API key (required) |
+| Chunk size | 500 tokens | Size of each document segment |
+| Chunk overlap | 50 tokens | Overlap between adjacent chunks |
+| FAISS persistence | Disabled | Enable to reuse index across runs |
 
 ---
 
-## Notes
-
-- Default chunk size is 500 tokens with 50-token overlap
-- FAISS index is built locally and not persisted between runs (can be enabled)
-- Supports mixing document types in the `data/` folder
+*Built as part of the IBM Generative AI Engineering Professional Certificate — [Project: Generative AI Applications with RAG and LangChain](https://www.coursera.org/learn/project-generative-ai-applications-with-rag-and-langchain) on Coursera.*
